@@ -21,12 +21,14 @@ import dev.maples.vm.IShellProxyService
 import dev.maples.vm.services.MachinaService
 import dev.maples.vm.services.ShellProxyService
 import dev.maples.vm.ui.theme.MachinaTheme
-import dev.maples.vm.utilities.Constants
 import rikka.shizuku.Shizuku
 import rikka.shizuku.ShizukuProvider
 
 
-const val SHIZUKU_REQUEST = 0
+private const val MANAGE_VM = "android.permission.MANAGE_VIRTUAL_MACHINE"
+private const val CUSTOM_VM = "android.permission.USE_CUSTOM_VIRTUAL_MACHINE"
+private const val SHIZUKU_REQUEST = 0
+
 class MainActivity : ComponentActivity() {
     private lateinit var mMachinaService: MachinaService
     private var mMachinaBound: Boolean = false
@@ -35,6 +37,7 @@ class MainActivity : ComponentActivity() {
             val binder = service as MachinaService.MachinaServiceBinder
             mMachinaService = binder.getService()
             mMachinaBound = true
+            mMachinaService.startVirtualMachine()
         }
 
         override fun onServiceDisconnected(arg0: ComponentName) {
@@ -53,26 +56,20 @@ class MainActivity : ComponentActivity() {
         override fun onServiceConnected(className: ComponentName, service: IBinder) {
             mShellProxyService = IShellProxyService.Stub.asInterface(service)
             mShellProxyServiceBound = true
+            // Start MachinaService
+            Intent(this@MainActivity, MachinaService::class.java).also { intent ->
+                bindService(
+                    intent,
+                    mMachinaServiceConnection,
+                    Context.BIND_AUTO_CREATE
+                )
+            }
         }
 
         override fun onServiceDisconnected(componentName: ComponentName) {
             mShellProxyServiceBound = false
         }
     }
-
-    private val requestPermissionResultListener =
-        Shizuku.OnRequestPermissionResultListener { requestCode, grantResult ->
-            if (grantResult == PackageManager.PERMISSION_GRANTED) {
-                if (Shizuku.getVersion() >= 10) {
-                    Shizuku.bindUserService(mShellProxyServiceArgs, mShellProxyServiceConnection)
-                } else {
-                    //Tell the user to upgrade Shizuku.
-                }
-                grantVirtualMachinePermissions()
-            } else {
-                onPermissionDenied()
-            }
-        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -86,21 +83,26 @@ class MainActivity : ComponentActivity() {
         }
 
         // Setup Shizuku
-        Shizuku.addRequestPermissionResultListener(requestPermissionResultListener);
         val shizukuGranted = if (Shizuku.isPreV11() || Shizuku.getVersion() < 11) {
             checkSelfPermission(ShizukuProvider.PERMISSION) == PackageManager.PERMISSION_GRANTED
         } else {
             Shizuku.checkSelfPermission() == PackageManager.PERMISSION_GRANTED
         }
-        if (!shizukuGranted) Shizuku.requestPermission(SHIZUKU_REQUEST)
 
-        // Start MachinaService
-        Intent(this, MachinaService::class.java).also { intent ->
-            bindService(
-                intent,
-                mMachinaServiceConnection,
-                Context.BIND_AUTO_CREATE
-            )
+        Shizuku.addRequestPermissionResultListener { _, grantResult ->
+            if (grantResult == PackageManager.PERMISSION_GRANTED) {
+                if (Shizuku.getVersion() < 10) {
+                    //Tell the user to upgrade Shizuku.
+                } else {
+                }
+            } else {
+                onPermissionDenied()
+            }
+        }
+
+        when (shizukuGranted) {
+            true -> Shizuku.bindUserService(mShellProxyServiceArgs, mShellProxyServiceConnection)
+            false -> Shizuku.requestPermission(SHIZUKU_REQUEST)
         }
     }
 
@@ -115,18 +117,17 @@ class MainActivity : ComponentActivity() {
 
     private fun grantVirtualMachinePermissions() {
         // Grant permissions
-        mShellProxyService.grantPermission(Constants.MANAGE_VM)
+        mShellProxyService.grantPermission(MANAGE_VM)
         try {
-            mShellProxyService.grantPermission(Constants.CUSTOM_VM)
+            mShellProxyService.grantPermission(CUSTOM_VM)
         } catch (e: Exception) {
             // System is using older version of virtualizationservice
         }
 
         // Verify permissions are granted
-        val manageIsGranted =
-            checkSelfPermission(Constants.MANAGE_VM) == PackageManager.PERMISSION_GRANTED
+        val manageIsGranted = checkSelfPermission(MANAGE_VM) == PackageManager.PERMISSION_GRANTED
         val customIsGranted = try {
-            checkSelfPermission(Constants.CUSTOM_VM) == PackageManager.PERMISSION_GRANTED
+            checkSelfPermission(CUSTOM_VM) == PackageManager.PERMISSION_GRANTED
         } catch (e: Exception) {
             true
         }

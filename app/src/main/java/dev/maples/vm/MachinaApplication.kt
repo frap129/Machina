@@ -5,7 +5,6 @@ import android.content.Context
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 import org.koin.dsl.module
-import org.lsposed.hiddenapibypass.HiddenApiBypass
 import timber.log.Timber
 
 class MachinaApplication: Application() {
@@ -24,8 +23,6 @@ class MachinaApplication: Application() {
     }
 
     override fun attachBaseContext(base: Context) {
-        HiddenApiBypass.addHiddenApiExemptions("L")
-
         startKoin {
             androidContext(base)
             modules(appModule)
