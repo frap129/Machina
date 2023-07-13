@@ -12,8 +12,6 @@ import dev.maples.vm.model.data.PermissionFailed
 import dev.maples.vm.model.data.PermissionGranted
 import dev.maples.vm.model.data.PermissionPending
 import dev.maples.vm.model.data.PermissionState
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -28,8 +26,6 @@ const val PERMISSION_MANAGE_VM = "android.permission.MANAGE_VIRTUAL_MACHINE"
 const val PERMISSION_CUSTOM_VM = "android.permission.USE_CUSTOM_VIRTUAL_MACHINE"
 
 class PermissionsRepository(private val context: Context) {
-    private val scope = CoroutineScope(Dispatchers.IO)
-
     private fun grantPermission(permission: String) {
         IPackageManager.Stub
             .asInterface(

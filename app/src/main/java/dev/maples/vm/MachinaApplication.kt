@@ -4,6 +4,8 @@ import android.app.Application
 import android.content.Context
 import dev.maples.vm.model.repository.MachineRepository
 import dev.maples.vm.model.repository.PreferencesRepository
+import dev.maples.vm.viewmodel.MachineViewModel
+import dev.maples.vm.viewmodel.PermissionsViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 import org.koin.dsl.module
@@ -19,6 +21,11 @@ class MachinaApplication : Application() {
         single<MachineRepository> { MachineRepository(androidContext()) }
     }
 
+    private val viewModelModule = module {
+        single<PermissionsViewModel> { PermissionsViewModel(get()) }
+        single<MachineViewModel> { MachineViewModel(get()) }
+    }
+
     override fun onCreate() {
         super.onCreate()
 
@@ -32,7 +39,7 @@ class MachinaApplication : Application() {
     override fun attachBaseContext(base: Context) {
         startKoin {
             androidContext(base)
-            modules(appModule, repoModule)
+            modules(appModule, repoModule, viewModelModule)
         }
         super.attachBaseContext(base)
     }
