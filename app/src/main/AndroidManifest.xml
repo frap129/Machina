@@ -15,7 +15,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Machina">
         <service
-            android:name=".services.MachinaService"
+            android:name=".model.services.MachinaService"
             android:enabled="true"
             android:exported="false"/>
 
@@ -24,7 +24,7 @@
             android:required="true" />
 
         <activity
-            android:name=".activities.MainActivity"
+            android:name=".ui.MainActivity"
             android:exported="true"
             android:theme="@style/Theme.Machina">
             <intent-filter>

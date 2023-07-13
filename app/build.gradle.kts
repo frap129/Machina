@@ -68,6 +68,8 @@ dependencies {
     annotationProcessor(libs.androidx.lifecycle.compiler)
     implementation(libs.androidx.lifecycle.service)
     implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.datastore.preferences)
+
 
     // Compose
     implementation(libs.activity.compose)

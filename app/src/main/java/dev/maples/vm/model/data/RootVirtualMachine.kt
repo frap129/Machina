@@ -1,4 +1,4 @@
-package dev.maples.vm.models
+package dev.maples.vm.model.data
 
 import android.os.ParcelFileDescriptor
 import android.system.virtualizationservice.DiskImage
@@ -11,7 +11,8 @@ const val KERNEL_PATH = "$IMAGE_DIR/kernel"
 const val ROOTFS_PATH = "$IMAGE_DIR/alpine-erofs.img"
 const val DATA_PATH = "$IMAGE_DIR/data.qcow2"
 const val SWAP_PATH = "$IMAGE_DIR/swap.qcow2"
-object RootVirtualMachine: VirtualMachineRawConfig() {
+
+object RootVirtualMachine : VirtualMachineRawConfig() {
     init {
         params = "panic=-1 root=/dev/vda rootfstype=erofs ro init=/opt/machina/init"
         kernel = ParcelFileDescriptor.open(
