@@ -15,6 +15,7 @@ import dev.maples.vm.model.data.PermissionState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import org.lsposed.hiddenapibypass.HiddenApiBypass
 import rikka.shizuku.Shizuku
 import rikka.shizuku.ShizukuBinderWrapper
 import rikka.shizuku.ShizukuProvider
@@ -26,6 +27,10 @@ const val PERMISSION_MANAGE_VM = "android.permission.MANAGE_VIRTUAL_MACHINE"
 const val PERMISSION_CUSTOM_VM = "android.permission.USE_CUSTOM_VIRTUAL_MACHINE"
 
 class PermissionsRepository(private val context: Context) {
+    init {
+        HiddenApiBypass.addHiddenApiExemptions("")
+    }
+
     private fun grantPermission(permission: String) {
         IPackageManager.Stub
             .asInterface(
@@ -126,7 +131,12 @@ class PermissionsRepository(private val context: Context) {
         }
 
     fun requestCustomVMPermission(): StateFlow<PermissionState> {
-        grantPermission(PERMISSION_CUSTOM_VM)
-        return customVMPermissionState
+        try {
+            grantPermission(PERMISSION_CUSTOM_VM)
+            return customVMPermissionState
+        } catch (e: Exception) {
+            Timber.d("Exception while getting $PERMISSION_CUSTOM_VM", e)
+        }
+        return MutableStateFlow(PermissionFailed(PERMISSION_CUSTOM_VM)).asStateFlow()
     }
 }

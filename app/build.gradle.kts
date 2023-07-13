@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.kotlinAndroid)
     alias(libs.plugins.refine)
+    alias(libs.plugins.ksp)
 }
 
 android {
@@ -26,12 +27,8 @@ android {
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
-    }
-    kotlinOptions {
-        jvmTarget = "1.8"
+    kotlin {
+        jvmToolchain(11)
     }
     buildFeatures {
         compose = true
@@ -39,7 +36,7 @@ android {
         buildConfig = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.4.3"
+        kotlinCompilerExtensionVersion = "1.4.8"
     }
     packaging {
         resources {
@@ -61,15 +58,16 @@ dependencies {
     implementation(libs.core.ktx)
     implementation(libs.appcompat)
 
-    // AndroidX
-    implementation(libs.androidx.core.splashscreen)
-    implementation(libs.androidx.fragment.ktx)
+    // Lifecyle
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     annotationProcessor(libs.androidx.lifecycle.compiler)
     implementation(libs.androidx.lifecycle.service)
-    implementation(libs.androidx.navigation.compose)
-    implementation(libs.androidx.datastore.preferences)
 
+    // Navigation
+   implementation(libs.androidx.navigation.compose)
+
+    // Data Storage
+    implementation(libs.androidx.datastore.preferences)
 
     // Compose
     implementation(libs.activity.compose)
@@ -90,6 +88,7 @@ dependencies {
 
     //Dependency Injection
     implementation(libs.koin.android)
+    implementation(libs.koin.androidx.compose)
 
     // Utilities
     implementation(libs.timber)
