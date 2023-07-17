@@ -58,7 +58,7 @@ dependencies {
     implementation(libs.core.ktx)
     implementation(libs.appcompat)
 
-    // Lifecyle
+    // Lifecycle
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     annotationProcessor(libs.androidx.lifecycle.compiler)
     implementation(libs.androidx.lifecycle.service)

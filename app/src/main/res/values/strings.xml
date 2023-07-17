@@ -2,11 +2,14 @@
     <string name="app_name">Machina</string>
 
     <!-- Permissions -->
-    <string name="shizuku_desc">Shizuku is required for creating virtual machines</string>
+    <string name="shizuku_desc">Permission to use Shizuku is required to access the Android Virtualization Framework</string>
     <string name="request_shizuku">Connect to Shizuku</string>
     <string name="shizuku_pending">Allow access to Shizuku to continue…</string>
     <string name="shizuku_denied">Oops! Permission was denied. Please allow access to continue</string>
     <string name="shizuku_failed">Yikes, something went wrong. Make sure Shizuku is installed and up to date</string>
+    <string name="manage_vm_desc">To access the system virtualization service, the "MANAGE_VIRTUAL_MACHINE" permission is required. Shizuku is used to grant this, so you won\'t see a pop up.</string>
     <string name="manage_vm_pending">Granting android.permission.MANAGE_VIRTUAL_MACHINE to self…</string>
+    <string name="custom_vm_desc">To make a virtual machine, the "USE_CUSTOM_VIRTUAL_MACHINE" permission is required. Shizuku is used to grant this, so you won\'t see a pop up.</string>
     <string name="custom_vm_pending">Granting android.permission.USE_CUSTOM_VIRTUAL_MACHINE to self…</string>
+    <string name="allow">Allow</string>
 </resources>

@@ -1,9 +1,6 @@
 [versions]
 agp = "8.2.0-alpha11"
-compose-destinations = "1.8.42-beta"
-core-splashscreen = "1.0.1"
 datastore-preferences = "1.0.0"
-fragment-ktx = "1.6.0"
 hiddenapibypass = "4.3"
 koin-android = "3.4.0"
 koin-androidx-compose = "3.4.5"
@@ -24,25 +21,19 @@ shizuku = "13.1.4"
 appcompat = "1.6.1"
 timber = "5.0.1"
 ksp = "1.8.22-1.0.11"
-ui-text-google-fonts = "1.4.3"
 
 [libraries]
-androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "core-splashscreen" }
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastore-preferences" }
-androidx-fragment-ktx = { module = "androidx.fragment:fragment-ktx", version.ref = "fragment-ktx" }
 androidx-lifecycle-compiler = { module = "androidx.lifecycle:lifecycle-compiler", version.ref = "lifecycle" }
 androidx-lifecycle-service = { module = "androidx.lifecycle:lifecycle-service", version.ref = "lifecycle" }
 androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycle" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigation-compose" }
-androidx-ui-text-google-fonts = { module = "androidx.compose.ui:ui-text-google-fonts", version.ref = "ui-text-google-fonts" }
-compose-destinations-core = { module = "io.github.raamcosta.compose-destinations:core", version.ref = "compose-destinations" }
 hiddenapibypass = { module = "org.lsposed.hiddenapibypass:hiddenapibypass", version.ref = "hiddenapibypass" }
 koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin-android" }
 koin-androidx-compose = { module = "io.insert-koin:koin-androidx-compose", version.ref = "koin-androidx-compose" }
 kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin-reflect" }
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinx-coroutines-core" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx-coroutines-core" }
-compose-destinations-ksp = { module = "io.github.raamcosta.compose-destinations:ksp", version.ref = "compose-destinations" }
 phoenix = { module = "com.jakewharton:process-phoenix", version.ref = "process-phoenix" }
 refine-annotation = { module = "dev.rikka.tools.refine:annotation", version.ref = "refine" }
 refine-annotation-processor = { module = "dev.rikka.tools.refine:annotation-processor", version.ref = "refine" }

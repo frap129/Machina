@@ -7,10 +7,6 @@ import androidx.core.content.PermissionChecker.PERMISSION_DENIED
 import androidx.core.content.PermissionChecker.PERMISSION_GRANTED
 import androidx.core.content.PermissionChecker.PermissionResult
 import dev.maples.vm.BuildConfig
-import dev.maples.vm.model.data.PermissionDenied
-import dev.maples.vm.model.data.PermissionFailed
-import dev.maples.vm.model.data.PermissionGranted
-import dev.maples.vm.model.data.PermissionPending
 import dev.maples.vm.model.data.PermissionState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -45,7 +41,7 @@ class PermissionsRepository(private val context: Context) {
         Shizuku Permission
      */
     private val _shizukuPermissionState: MutableStateFlow<PermissionState> = MutableStateFlow(
-        PermissionPending(ShizukuProvider.PERMISSION)
+        PermissionState.Pending
     )
     val shizukuPermissionState = _shizukuPermissionState.asStateFlow()
         get() {
@@ -63,11 +59,11 @@ class PermissionsRepository(private val context: Context) {
 
     private fun getShizukuPermissionState(@PermissionResult permission: Int): PermissionState {
         return if (Shizuku.getVersion() < 10) {
-            PermissionFailed(ShizukuProvider.PERMISSION)
+            PermissionState.Failed
         } else if (permission == PERMISSION_GRANTED) {
-            PermissionGranted(ShizukuProvider.PERMISSION)
+            PermissionState.Granted
         } else {
-            PermissionDenied(ShizukuProvider.PERMISSION)
+            PermissionState.Denied
         }
     }
 
@@ -81,7 +77,7 @@ class PermissionsRepository(private val context: Context) {
         MANAGE_VIRTUAL_MACHINE Permission
      */
     private val _manageVMPermissionState: MutableStateFlow<PermissionState> = MutableStateFlow(
-        PermissionPending(PERMISSION_MANAGE_VM)
+        PermissionState.Pending
     )
     val manageVMPermissionState = _manageVMPermissionState.asStateFlow()
         get() {
@@ -89,13 +85,13 @@ class PermissionsRepository(private val context: Context) {
                 val result = PermissionChecker.checkSelfPermission(context, PERMISSION_MANAGE_VM)
 
                 _manageVMPermissionState.value = when (result) {
-                    PERMISSION_GRANTED -> PermissionGranted(PERMISSION_MANAGE_VM)
-                    PERMISSION_DENIED -> PermissionDenied(PERMISSION_MANAGE_VM)
-                    else -> PermissionFailed(PERMISSION_MANAGE_VM)
+                    PERMISSION_GRANTED -> PermissionState.Granted
+                    PERMISSION_DENIED -> PermissionState.Denied
+                    else -> PermissionState.Failed
                 }
             } catch (e: Exception) {
                 Timber.d("Exception while getting $PERMISSION_MANAGE_VM", e)
-                _manageVMPermissionState.value = PermissionFailed(PERMISSION_MANAGE_VM)
+                _manageVMPermissionState.value = PermissionState.Failed
             }
 
             return field
@@ -110,7 +106,7 @@ class PermissionsRepository(private val context: Context) {
         USE_CUSTOM_VIRTUAL_MACHINE Permission
      */
     private val _customVMPermissionState: MutableStateFlow<PermissionState> = MutableStateFlow(
-        PermissionPending(PERMISSION_CUSTOM_VM)
+        PermissionState.Pending
     )
     val customVMPermissionState = _customVMPermissionState.asStateFlow()
         get() {
@@ -118,13 +114,13 @@ class PermissionsRepository(private val context: Context) {
                 val result = PermissionChecker.checkSelfPermission(context, PERMISSION_CUSTOM_VM)
 
                 _customVMPermissionState.value = when (result) {
-                    PERMISSION_GRANTED -> PermissionGranted(PERMISSION_CUSTOM_VM)
-                    PERMISSION_DENIED -> PermissionDenied(PERMISSION_CUSTOM_VM)
-                    else -> PermissionFailed(PERMISSION_CUSTOM_VM)
+                    PERMISSION_GRANTED -> PermissionState.Granted
+                    PERMISSION_DENIED -> PermissionState.Denied
+                    else -> PermissionState.Failed
                 }
             } catch (e: Exception) {
                 Timber.d("Exception while getting $PERMISSION_CUSTOM_VM", e)
-                _customVMPermissionState.value = PermissionFailed(PERMISSION_CUSTOM_VM)
+                _customVMPermissionState.value = PermissionState.Failed
             }
 
             return field
@@ -137,6 +133,6 @@ class PermissionsRepository(private val context: Context) {
         } catch (e: Exception) {
             Timber.d("Exception while getting $PERMISSION_CUSTOM_VM", e)
         }
-        return MutableStateFlow(PermissionFailed(PERMISSION_CUSTOM_VM)).asStateFlow()
+        return MutableStateFlow(PermissionState.Failed).asStateFlow()
     }
 }
