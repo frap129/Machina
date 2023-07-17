@@ -46,11 +46,21 @@ fun PermissionsScreen(
 
                 PermissionState.Granted -> {
                     // Request USE_CUSTOM_VIRTUAL_MACHINE
-                    // This doesn't exist on older AVF versions, so silently grant it to avoid
-                    // getting stuck in denied
-                    // TODO: Handle this
                     val customVMPermission = permissionsViewModel
-                        .requestPermission(MachinaPermission.CUSTOM_VM_PERMISSION)
+                        .getPermissionState(MachinaPermission.CUSTOM_VM_PERMISSION)
+                        .collectAsState()
+
+                    when (customVMPermission.value) {
+                        PermissionState.Denied, PermissionState.Pending -> RequestPermissionScreen(
+                            requestMessage = stringResource(id = R.string.custom_vm_desc),
+                            buttonMessage = stringResource(id = R.string.allow),
+                            pendingMessage = stringResource(id = R.string.custom_vm_pending),
+                            permission = MachinaPermission.CUSTOM_VM_PERMISSION
+                        )
+
+                        PermissionState.Granted, PermissionState.Failed -> navController
+                            .navigate("machines")
+                    }
                 }
             }
         }

@@ -2,6 +2,7 @@ package dev.maples.vm.model.repository
 
 import android.content.Context
 import android.content.pm.IPackageManager
+import android.content.pm.PackageManager
 import androidx.core.content.PermissionChecker
 import androidx.core.content.PermissionChecker.PERMISSION_DENIED
 import androidx.core.content.PermissionChecker.PERMISSION_GRANTED
@@ -108,15 +109,29 @@ class PermissionsRepository(private val context: Context) {
     private val _customVMPermissionState: MutableStateFlow<PermissionState> = MutableStateFlow(
         PermissionState.Pending
     )
+
     val customVMPermissionState = _customVMPermissionState.asStateFlow()
         get() {
             try {
-                val result = PermissionChecker.checkSelfPermission(context, PERMISSION_CUSTOM_VM)
+                // Check if permission exists
+                val virtualizationServiceInfo = context.packageManager.getPackageInfo(
+                    "com.android.virtualmachine.res",
+                    PackageManager.PackageInfoFlags.of(PackageManager.GET_PERMISSIONS.toLong())
+                )
 
-                _customVMPermissionState.value = when (result) {
-                    PERMISSION_GRANTED -> PermissionState.Granted
-                    PERMISSION_DENIED -> PermissionState.Denied
-                    else -> PermissionState.Failed
+                if (virtualizationServiceInfo.permissions.any { it.name == PERMISSION_CUSTOM_VM }) {
+                    // Get state of permission if it exists
+                    val result =
+                        PermissionChecker.checkSelfPermission(context, PERMISSION_CUSTOM_VM)
+
+                    _customVMPermissionState.value = when (result) {
+                        PERMISSION_GRANTED -> PermissionState.Granted
+                        PERMISSION_DENIED -> PermissionState.Denied
+                        else -> PermissionState.Failed
+                    }
+                } else {
+                    // Mark as failed if it doesn't exist
+                    _customVMPermissionState.value = PermissionState.Failed
                 }
             } catch (e: Exception) {
                 Timber.d("Exception while getting $PERMISSION_CUSTOM_VM", e)
