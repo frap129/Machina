@@ -14,7 +14,7 @@ const val SWAP_PATH = "$IMAGE_DIR/swap.qcow2"
 
 object RootVirtualMachine : VirtualMachineRawConfig() {
     init {
-        params = "panic=-1 root=/dev/vda rootfstype=erofs ro init=/opt/machina/init"
+        params = "panic=-1 rcu_nocbs=0-7 workqueue.power_efficient=1 root=/dev/vda rootfstype=erofs ro init=/opt/machina/init"
         kernel = ParcelFileDescriptor.open(
             File(KERNEL_PATH),
             ParcelFileDescriptor.MODE_READ_ONLY
@@ -50,7 +50,9 @@ object RootVirtualMachine : VirtualMachineRawConfig() {
         )
         protectedVm = false
         platformVersion = "1.0"
-        taskProfiles = arrayOf()
+        taskProfiles = arrayOf("MaxPerformance", "MaxIoPriority")
+        numCpus = 8
+        cpuAffinity = "0-7"
     }
 
     val config = VirtualMachineConfig().apply { rawConfig = this@RootVirtualMachine }
