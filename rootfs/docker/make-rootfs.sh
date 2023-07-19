@@ -2,12 +2,16 @@
 
 # Build rootfs into a directory
 ./alpine-make-rootfs/alpine-make-rootfs \
-    --packages socat \
+    --packages 'alpine-base socat' \
     /out/machina-rootfs/
 
 # Copy Machina tools to rootfs
 mkdir /out/machina-rootfs/opt/machina
-cp machina/* /out/machina-rootfs/opt/machina/ 
+cp machina/* /out/machina-rootfs/opt/machina/
+
+# Write fstab
+echo '/dev/vda / erofs rw,noatime 0 0
+tmpfs /tmp tmpfs rw,noatime 0 0' > /out/machina-rootfs/etc/fstab
 
 # Add init to inittab
 echo "::sysinit:/opt/machina/init" >> /out/machina-rootfs/etc/inittab
