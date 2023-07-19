@@ -1,0 +1,3 @@
+#!/bin/sh
+
+socat VSOCK_LISTEN:6294,reuseaddr,fork EXEC:/bin/sh

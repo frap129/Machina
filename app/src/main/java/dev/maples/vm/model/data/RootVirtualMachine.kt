@@ -8,7 +8,7 @@ import java.io.File
 
 const val IMAGE_DIR = "/data/local/tmp"
 const val KERNEL_PATH = "$IMAGE_DIR/kernel"
-const val ROOTFS_PATH = "$IMAGE_DIR/alpine-erofs.img"
+const val ROOTFS_PATH = "$IMAGE_DIR/machina-rootfs.img"
 const val DATA_PATH = "$IMAGE_DIR/data.qcow2"
 const val SWAP_PATH = "$IMAGE_DIR/swap.qcow2"
 
