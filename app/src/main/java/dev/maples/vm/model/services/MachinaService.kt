@@ -10,6 +10,10 @@ import android.system.virtualizationservice.DeathReason
 import android.system.virtualizationservice.IVirtualMachineCallback
 import android.system.virtualizationservice.IVirtualizationService
 import dev.maples.vm.model.data.RootVirtualMachine
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.lsposed.hiddenapibypass.HiddenApiBypass
 import timber.log.Timber
 import java.io.File
@@ -55,6 +59,11 @@ class MachinaService : Service() {
 
         virtualMachine.registerCallback(rootVMCallback)
         virtualMachine.start()
+        CoroutineScope(Dispatchers.IO).launch {
+            delay(3000)
+            val shellFileDescriptor = virtualMachine.connectVsock(6294)
+            Timber.d("Connected to vsock")
+        }
     }
 
     private fun deathReason(reason: Int): String {
@@ -82,5 +91,4 @@ class MachinaService : Service() {
         override fun onPayloadReady(cid: Int) {}
         override fun onPayloadFinished(cid: Int, exitCode: Int) {}
     }
-
 }
