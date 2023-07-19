@@ -14,7 +14,7 @@ const val SWAP_PATH = "$IMAGE_DIR/swap.qcow2"
 
 object RootVirtualMachine : VirtualMachineRawConfig() {
     init {
-        params = "panic=-1 rcu_nocbs=0-7 workqueue.power_efficient=1 root=/dev/vda rootfstype=erofs ro init=/opt/machina/init"
+        params = "panic=-1 rcu_nocbs=0-7 workqueue.power_efficient=1 root=/dev/vda rootfstype=erofs ro init=/opt/machina/preinit"
         kernel = ParcelFileDescriptor.open(
             File(KERNEL_PATH),
             ParcelFileDescriptor.MODE_READ_ONLY
