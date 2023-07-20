@@ -16,7 +16,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.lsposed.hiddenapibypass.HiddenApiBypass
 import timber.log.Timber
-import java.io.File
 import kotlin.reflect.full.memberProperties
 
 class MachinaService : Service() {
@@ -28,6 +27,20 @@ class MachinaService : Service() {
     override fun onBind(intent: Intent): IBinder = binder
     inner class MachinaServiceBinder : Binder() {
         fun getService(): MachinaService = this@MachinaService
+    }
+
+    val mConsoleReader: ParcelFileDescriptor
+    val mConsoleWriter: ParcelFileDescriptor
+    val mLogReader: ParcelFileDescriptor
+    val mLogWriter: ParcelFileDescriptor
+
+    init {
+        var pipes: Array<ParcelFileDescriptor> = ParcelFileDescriptor.createPipe()
+        mConsoleReader = pipes[0]
+        mConsoleWriter = pipes[1]
+        pipes = ParcelFileDescriptor.createPipe()
+        mLogReader = pipes[0]
+        mLogWriter = pipes[1]
     }
 
     private fun getVirtualizationService(): IVirtualizationService {
@@ -43,17 +56,7 @@ class MachinaService : Service() {
         val virtService = getVirtualizationService()
         val vmConfig = RootVirtualMachine.config
 
-        val virtualMachine = virtService.createVm(
-            vmConfig,
-            ParcelFileDescriptor.open(
-                File("/data/local/tmp/console"),
-                ParcelFileDescriptor.MODE_READ_WRITE
-            ),
-            ParcelFileDescriptor.open(
-                File("/data/local/tmp/log"),
-                ParcelFileDescriptor.MODE_READ_WRITE
-            )
-        )
+        val virtualMachine = virtService.createVm(vmConfig, mConsoleWriter, mLogWriter)
 
         Timber.d("Created virtual machine: " + virtualMachine.cid)
 
@@ -61,7 +64,7 @@ class MachinaService : Service() {
         virtualMachine.start()
         CoroutineScope(Dispatchers.IO).launch {
             delay(3000)
-            val shellFileDescriptor = virtualMachine.connectVsock(6294)
+            //val shellFileDescriptor = virtualMachine.connectVsock(6294)
             Timber.d("Connected to vsock")
         }
     }
@@ -83,7 +86,7 @@ class MachinaService : Service() {
         }
 
         override fun onDied(cid: Int, reason: Int) {
-            Timber.d("CID $cid died: ${deathReason(reason)}")
+            Timber.d("CID $cid died: $reason")
         }
 
         // No-op for custom VMs
