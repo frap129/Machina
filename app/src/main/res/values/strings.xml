@@ -12,4 +12,9 @@
     <string name="custom_vm_desc">To make a virtual machine, the "USE_CUSTOM_VIRTUAL_MACHINE" permission is required. Shizuku is used to grant this, so you won\'t see a pop up.</string>
     <string name="custom_vm_pending">Granting android.permission.USE_CUSTOM_VIRTUAL_MACHINE to self…</string>
     <string name="allow">Allow</string>
+
+    <!-- VM Controls -->
+    <string name="run_vm">Run VM</string>
+    <string name="stop_vm">Stop VM</string>
+
 </resources>

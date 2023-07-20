@@ -2,6 +2,7 @@ package dev.maples.vm.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -15,9 +16,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import dev.maples.vm.R
 import dev.maples.vm.viewmodel.MachineViewModel
 import org.koin.androidx.compose.koinViewModel
 
@@ -28,17 +31,29 @@ fun MachinesScreen(
 ) {
 
     val consoleVisibility = remember { mutableStateOf(false) }
-    Column(modifier = Modifier.fillMaxWidth()) {
-        Button(
-            modifier = Modifier
-                .align(Alignment.CenterHorizontally)
-                .padding(30.dp),
-            onClick = {
-                consoleVisibility.value = true
-                machineViewModel.startRootVirtualMachine()
+    Column(modifier = Modifier.fillMaxWidth()){
+        Row(modifier = Modifier.align(Alignment.CenterHorizontally)) {
+            Button(
+                modifier = Modifier.padding(30.dp),
+                onClick = {
+                    consoleVisibility.value = true
+                    machineViewModel.startRootVirtualMachine()
+                }
+            ) {
+                Text(text = stringResource(id = R.string.run_vm))
             }
-        ) {
-            Text(text = "Run VM")
+
+            if (consoleVisibility.value) {
+                Button(
+                    modifier = Modifier.padding(30.dp),
+                    onClick = {
+                        consoleVisibility.value = false
+                        machineViewModel.stopRootVirtualMachine()
+                    }
+                ) {
+                    Text(text = stringResource(id = R.string.stop_vm))
+                }
+            }
         }
 
         if (consoleVisibility.value) {

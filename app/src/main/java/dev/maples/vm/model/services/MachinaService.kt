@@ -7,6 +7,7 @@ import android.os.IBinder
 import android.os.ParcelFileDescriptor
 import android.os.ServiceManager
 import android.system.virtualizationservice.DeathReason
+import android.system.virtualizationservice.IVirtualMachine
 import android.system.virtualizationservice.IVirtualMachineCallback
 import android.system.virtualizationservice.IVirtualizationService
 import dev.maples.vm.model.data.RootVirtualMachine
@@ -16,6 +17,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.lsposed.hiddenapibypass.HiddenApiBypass
 import timber.log.Timber
+import kotlin.reflect.full.declaredMemberProperties
 import kotlin.reflect.full.memberProperties
 
 class MachinaService : Service() {
@@ -29,10 +31,12 @@ class MachinaService : Service() {
         fun getService(): MachinaService = this@MachinaService
     }
 
+    private lateinit var mVirtService: IVirtualizationService
+    private var virtualMachine: IVirtualMachine? = null
     val mConsoleReader: ParcelFileDescriptor
-    val mConsoleWriter: ParcelFileDescriptor
+    private val mConsoleWriter: ParcelFileDescriptor
     val mLogReader: ParcelFileDescriptor
-    val mLogWriter: ParcelFileDescriptor
+    private val mLogWriter: ParcelFileDescriptor
 
     init {
         var pipes: Array<ParcelFileDescriptor> = ParcelFileDescriptor.createPipe()
@@ -43,25 +47,23 @@ class MachinaService : Service() {
         mLogWriter = pipes[1]
     }
 
-    private fun getVirtualizationService(): IVirtualizationService {
-        val virtService = IVirtualizationService.Stub.asInterface(
+    private fun getVirtualizationService() {
+        mVirtService = IVirtualizationService.Stub.asInterface(
             ServiceManager.waitForService("android.system.virtualizationservice")
         )
         Timber.d("Acquired virtualizationservice")
-
-        return virtService
     }
 
     fun startVirtualMachine() {
-        val virtService = getVirtualizationService()
+        getVirtualizationService()
         val vmConfig = RootVirtualMachine.config
 
-        val virtualMachine = virtService.createVm(vmConfig, mConsoleWriter, mLogWriter)
+        virtualMachine = mVirtService.createVm(vmConfig, mConsoleWriter, mLogWriter)
 
-        Timber.d("Created virtual machine: " + virtualMachine.cid)
+        Timber.d("Created virtual machine: ${virtualMachine?.cid}")
 
-        virtualMachine.registerCallback(rootVMCallback)
-        virtualMachine.start()
+        virtualMachine?.registerCallback(rootVMCallback)
+        virtualMachine?.start()
         CoroutineScope(Dispatchers.IO).launch {
             delay(3000)
             //val shellFileDescriptor = virtualMachine.connectVsock(6294)
@@ -69,10 +71,15 @@ class MachinaService : Service() {
         }
     }
 
+    fun stopVirtualMachine() {
+        // Dropping the IVirtualMachine handle stops the VM
+        virtualMachine = null
+    }
+
     private fun deathReason(reason: Int): String {
         var name = ""
-        DeathReason::class.memberProperties.forEach {
-            if ((it.getter.call() as Int) == reason) {
+        DeathReason::class.java.fields.forEach {
+            if ((it.get(null) as Int) == reason) {
                 name = it.name
                 return@forEach
             }
@@ -86,7 +93,7 @@ class MachinaService : Service() {
         }
 
         override fun onDied(cid: Int, reason: Int) {
-            Timber.d("CID $cid died: $reason")
+            Timber.d("CID $cid died: ${deathReason(reason)}")
         }
 
         // No-op for custom VMs

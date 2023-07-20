@@ -54,7 +54,6 @@ class MachineRepository(private val context: Context) {
     private val mConsoleTextState: MutableState<String> = mutableStateOf("")
     val consoleTextState: State<String> = mConsoleTextState
 
-
     fun startMachinaService() {
         Intent(context, MachinaService::class.java).also { intent ->
             context.bindService(
@@ -65,6 +64,11 @@ class MachineRepository(private val context: Context) {
         }
     }
 
+    fun stopVirtualMachine() {
+        if (mMachinaBound) {
+            mMachinaService.stopVirtualMachine()
+        }
+    }
 
     internal class Reader(
         private val mName: String,
