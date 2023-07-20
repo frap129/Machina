@@ -1,5 +1,5 @@
 [versions]
-agp = "8.2.0-alpha11"
+agp = "8.1.0-rc01"
 datastore-preferences = "1.0.0"
 hiddenapibypass = "4.3"
 koin-android = "3.4.0"
