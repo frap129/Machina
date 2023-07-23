@@ -31,7 +31,7 @@ fun MachinesScreen(
 ) {
 
     val consoleVisibility = remember { mutableStateOf(false) }
-    Column(modifier = Modifier.fillMaxWidth()){
+    Column(modifier = Modifier.fillMaxWidth()) {
         Row(modifier = Modifier.align(Alignment.CenterHorizontally)) {
             Button(
                 modifier = Modifier.padding(30.dp),

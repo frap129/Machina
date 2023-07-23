@@ -1,0 +1,11 @@
+#!/bin/sh
+
+# Mount devpts
+mkdir /dev/pts
+mount -t devpts devpts /dev/pts
+
+#socat VSOCK-LISTEN:6294,reuseaddr,fork EXEC:'/bin/bash -li',pty,stderr,setsid,sigint,sane,ctty
+#socat VSOCK-LISTEN:6294,reuseaddr,fork EXEC:'/bin/sh -i',pty,ctty
+
+# Drop into vsock shell
+/opt/machina/vsock-shell

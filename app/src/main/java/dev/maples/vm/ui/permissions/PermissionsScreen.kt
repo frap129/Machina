@@ -57,6 +57,7 @@ fun PermissionsScreen(
                             pendingMessage = stringResource(id = R.string.custom_vm_pending),
                             permission = MachinaPermission.CUSTOM_VM_PERMISSION
                         )
+
                         PermissionState.Granted, PermissionState.Failed -> navController
                             .navigate("machines")
                     }

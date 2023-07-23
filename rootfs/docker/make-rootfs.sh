@@ -2,12 +2,15 @@
 
 # Build rootfs into a directory
 ./alpine-make-rootfs/alpine-make-rootfs \
-    --packages 'alpine-base socat' \
+    --packages 'alpine-base bash socat' \
     /out/machina-rootfs/
 
 # Copy Machina tools to rootfs
 mkdir /out/machina-rootfs/opt/machina
 cp machina/* /out/machina-rootfs/opt/machina/
+
+# Build C files
+clang -o /out/machina-rootfs/opt/machina/vsock-shell src/vsock-shell.c
 
 # Write fstab
 echo '/dev/vda / erofs rw,noatime 0 0
