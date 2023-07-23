@@ -72,7 +72,6 @@ int read_if_available(int vsock_fd, char *data, int data_len) {
 }
 
 int main() {
-
   int vsockin_socket = socket(AF_VSOCK, SOCK_STREAM, 0);
   int vsockout_socket = socket(AF_VSOCK, SOCK_STREAM, 0);
   int vsockin_conn = vsock_listen(vsockin_socket, RX_PORT);
@@ -82,6 +81,7 @@ int main() {
 
 
   // Create a new master/slave pty pair.
+  // TODO: Handle termios and winsize
   if (openpty(&master, &slave, NULL, NULL, NULL) < 0) {
     perror("openpty");
     return 1;
@@ -99,13 +99,14 @@ int main() {
     perror("fork");
     return 1;
   } else if (pid == 0) {
-    // Child process: exec bash in the slave pty.
+    // Child process: exec bash
     
     dup2(to_shell[0], STDIN_FILENO);
     close(to_shell[0]);
 
     close(from_shell[0]);
     dup2(from_shell[1], STDOUT_FILENO);
+    dup2(from_shell[1], STDERR_FILENO);
     close(from_shell[1]); 
 
     char *args[] = {"/bin/ash", "-i", NULL};
@@ -114,29 +115,33 @@ int main() {
     
     close(to_shell[1]);
     close(slave);
+    close(master);
     exit(1);
   }
 
+  // Parent process: Transfer data between vsocks and bash process.
   close(to_shell[0]);
   close(from_shell[1]);
   close(master); 
 
-  // Read and write data to the socket.
   int buf_size = sizeof(char) * 1024;
   char *buf = malloc(buf_size);
   while (1) {
+
+    // Write incomming data to stdin
     int n = read_if_available(vsockin_conn, buf, sizeof(buf));
     if (n > 0) {
       write(to_shell[1], buf, n);
     }
 
+    // Send data from stdout
     n = read_if_available(from_shell[0], buf, sizeof(buf));
     if (n > 0) {
       write(vsockout_conn, buf, n);
     }
   }
 
-  // Parent process: close the master pty and wait for the child to exit.
+  // Wait for child process to exit
   waitpid(pid, NULL, 0);
 
   // Close the sockets.
@@ -144,6 +149,7 @@ int main() {
   close(vsockout_socket);
   close(vsockin_conn);
   close(vsockout_conn);
+  free(buf);
 
   return 0;
 }
