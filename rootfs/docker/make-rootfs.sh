@@ -2,7 +2,7 @@
 
 # Build rootfs into a directory
 ./alpine-make-rootfs/alpine-make-rootfs \
-    --packages 'alpine-base bash socat' \
+    --packages 'alpine-base socat' \
     /out/machina-rootfs/
 
 # Copy Machina tools to rootfs

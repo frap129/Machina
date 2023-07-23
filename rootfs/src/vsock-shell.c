@@ -76,80 +76,45 @@ int main() {
   int vsockout_socket = socket(AF_VSOCK, SOCK_STREAM, 0);
   int vsockin_conn = vsock_listen(vsockin_socket, RX_PORT);
   int vsockout_conn = vsock_listen(vsockout_socket, TX_PORT);
-  int master, slave;
+  int master;
   pid_t pid;
 
-
-  // Create a new master/slave pty pair.
-  // TODO: Handle termios and winsize
-  if (openpty(&master, &slave, NULL, NULL, NULL) < 0) {
-    perror("openpty");
-    return 1;
-  }
-
-  // Create pipe to communicate with shell process
-  int to_shell[2];
-  int from_shell[2];
-  pipe(to_shell);
-  pipe(from_shell);
-
   // Fork a child process to run bash in the slave pty.
-  pid = fork();
+  // TODO: Handle termios and winsize
+  pid = forkpty(&master, NULL, NULL, NULL);
   if (pid < 0) {
-    perror("fork");
+    perror("forkpty");
     return 1;
   } else if (pid == 0) {
-    // Child process: exec bash
+    // Child process
+    close(master);
     
-    dup2(to_shell[0], STDIN_FILENO);
-    close(to_shell[0]);
+    // Replace STDIN/OUT/ERR with the vsocks
+    close(STDIN_FILENO);
+    close(STDOUT_FILENO);
+    close(STDERR_FILENO);
+    dup2(vsockin_conn, STDIN_FILENO);
+    close(vsockin_conn);
+    dup2(vsockout_conn, STDOUT_FILENO);
+    dup2(vsockout_conn, STDERR_FILENO);
+    close(vsockout_conn);
 
-    close(from_shell[0]);
-    dup2(from_shell[1], STDOUT_FILENO);
-    dup2(from_shell[1], STDERR_FILENO);
-    close(from_shell[1]); 
-
+    // Exec bash
     char *args[] = {"/bin/ash", "-i", NULL};
     execvp(args[0], args);
     perror("execv");
-    
-    close(to_shell[1]);
-    close(slave);
-    close(master);
     exit(1);
   }
 
-  // Parent process: Transfer data between vsocks and bash process.
-  close(to_shell[0]);
-  close(from_shell[1]);
-  close(master); 
-
-  int buf_size = sizeof(char) * 1024;
-  char *buf = malloc(buf_size);
-  while (1) {
-
-    // Write incomming data to stdin
-    int n = read_if_available(vsockin_conn, buf, sizeof(buf));
-    if (n > 0) {
-      write(to_shell[1], buf, n);
-    }
-
-    // Send data from stdout
-    n = read_if_available(from_shell[0], buf, sizeof(buf));
-    if (n > 0) {
-      write(vsockout_conn, buf, n);
-    }
-  }
-
-  // Wait for child process to exit
+  // Parent process: wait until child exits
   waitpid(pid, NULL, 0);
+  close(master); 
 
   // Close the sockets.
   close(vsockin_socket);
   close(vsockout_socket);
   close(vsockin_conn);
   close(vsockout_conn);
-  free(buf);
 
   return 0;
 }
