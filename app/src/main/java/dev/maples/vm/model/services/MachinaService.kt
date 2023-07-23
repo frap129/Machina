@@ -13,7 +13,6 @@ import dev.maples.vm.model.data.RootVirtualMachine
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import org.lsposed.hiddenapibypass.HiddenApiBypass
 import timber.log.Timber
@@ -29,14 +28,15 @@ class MachinaService : Service() {
     private val mBinder = MachinaServiceBinder()
     private lateinit var mVirtService: IVirtualizationService
     private var mRemoteShellManager: RemoteShellManager? = null
-    private val mLogWriter: ParcelFileDescriptor
 
     private var mVirtualMachine: IVirtualMachine? = null
     private val mConsoleWriter: ParcelFileDescriptor
+    private val mLogWriter: ParcelFileDescriptor
+    private val mShellWriter: ParcelFileDescriptor
 
     val mLogReader: ParcelFileDescriptor
     val mConsoleReader: ParcelFileDescriptor
-    val mShellText: MutableStateFlow<String> = MutableStateFlow("")
+    val mShellReader: ParcelFileDescriptor
 
     init {
         var pipes: Array<ParcelFileDescriptor> = ParcelFileDescriptor.createPipe()
@@ -45,6 +45,9 @@ class MachinaService : Service() {
         pipes = ParcelFileDescriptor.createPipe()
         mLogReader = pipes[0]
         mLogWriter = pipes[1]
+        pipes = ParcelFileDescriptor.createPipe()
+        mShellReader = pipes[0]
+        mShellWriter = pipes[1]
     }
 
     private fun getVirtualizationService() {
@@ -70,7 +73,7 @@ class MachinaService : Service() {
             // Wait for VM to boot
             delay(2500)
             try {
-                mRemoteShellManager = RemoteShellManager(mVirtualMachine!!, mShellText)
+                mRemoteShellManager = RemoteShellManager(mVirtualMachine!!, mShellWriter)
             } catch (e: Exception) {
                 Timber.d(e)
             }
@@ -85,6 +88,7 @@ class MachinaService : Service() {
     fun sendCommand(cmd: String) {
         mRemoteShellManager?.apply {
             var msg = cmd
+            if (cmd.isBlank()) return
             if (cmd.last() != '\n') {
                 msg += '\n'
             }
@@ -95,7 +99,7 @@ class MachinaService : Service() {
 
     private class RemoteShellManager(
         virtualMachine: IVirtualMachine,
-        private val shellText: MutableStateFlow<String>
+        shellWriter: ParcelFileDescriptor
     ) {
         companion object {
             const val READ_PORT = 5000
@@ -103,36 +107,32 @@ class MachinaService : Service() {
             private const val PROMPT_END = " # "
         }
 
+        private val scope = CoroutineScope(Dispatchers.IO)
         private val writeVsock = virtualMachine.connectVsock(WRITE_PORT)
         private val readVsock = virtualMachine.connectVsock(READ_PORT)
         private val vsockReader =
             FileInputStream(readVsock.fileDescriptor).bufferedReader(Charsets.UTF_8)
-        private val vsockWriter = FileOutputStream(writeVsock.fileDescriptor)
-        private val scope = CoroutineScope(Dispatchers.IO)
+        private val vsockStream = FileOutputStream(writeVsock.fileDescriptor)
 
+        val shellStream = FileOutputStream(shellWriter.fileDescriptor)
         var state: State = State.Starting
 
         init {
-            shellText.value = "Connecting to VM shell...\n"
-
             // Start reading
             scope.launch { readVsock() }
         }
 
         fun write(cmd: String) {
-            scope.launch { writeVsock(cmd) }
-        }
-
-        private suspend fun writeVsock(cmd: String) {
             state = State.Running.Writing
-            vsockWriter.write(cmd.toByteArray())
+            shellStream.write(cmd.toByteArray())
+            vsockStream.write(cmd.toByteArray())
         }
 
-        private suspend fun readVsock() {
+        private fun readVsock() {
             var line = ""
             while (readVsock.fileDescriptor.valid()) {
                 // Set polling rate
-                delay(10)
+                //delay(10)
                 state = State.Running.Reading
 
                 // Try to read from vsock
@@ -146,12 +146,12 @@ class MachinaService : Service() {
 
                 // Ignore end of stream
                 if (byte != -1) {
+                    shellStream.write(byte)
                     line += byte.toChar()
 
                     // Flush to state flow once we reach EOL or prompt
                     if (byte.toChar() == '\n' || line.endsWith(PROMPT_END)) {
                         Timber.d(line)
-                        shellText.value += line
                         line = ""
                     }
                 }
@@ -164,6 +164,7 @@ class MachinaService : Service() {
                 object Reading : Running()
                 object Writing : Running()
             }
+
             object Dead : State()
         }
     }
@@ -179,8 +180,7 @@ class MachinaService : Service() {
 
         // No-op for custom VMs
         override fun onPayloadStarted(cid: Int, stream: ParcelFileDescriptor?) {}
-        override fun onPayloadReady(cid: Int) { Timber.d("READY")}
-
+        override fun onPayloadReady(cid: Int) {}
         override fun onPayloadFinished(cid: Int, exitCode: Int) {}
     }
 

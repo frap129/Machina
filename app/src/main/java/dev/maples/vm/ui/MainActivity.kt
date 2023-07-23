@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -45,14 +46,15 @@ fun Machina() {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
     ) {
         Text(
             text = stringResource(R.string.app_name),
             fontSize = 30.sp,
-            textAlign = TextAlign.Center,
+            textAlign = TextAlign.Start,
             modifier = Modifier
-                .align(Alignment.CenterHorizontally)
+                .align(Alignment.Start)
+                .fillMaxWidth()
+                .padding(24.dp, 0.dp, 16.dp, 0.dp),
         )
 
         val navController = rememberNavController()

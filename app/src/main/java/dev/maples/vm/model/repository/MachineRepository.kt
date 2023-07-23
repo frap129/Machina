@@ -21,15 +21,6 @@ import java.io.InputStreamReader
 
 
 class MachineRepository(private val context: Context) {
-    /*
-        This class wont really do anything until we can run LXCs on the host VM and retrieve their
-        info. For now, expose the root vm as one of these to prove out the UI
-     */
-
-
-    /*
-        Machina Service
-     */
     private lateinit var mMachinaService: MachinaService
     private var mMachinaBound: Boolean = false
     private val mMachinaServiceConnection = object : ServiceConnection {
@@ -38,12 +29,16 @@ class MachineRepository(private val context: Context) {
             mMachinaService = binder.getService()
             mMachinaBound = true
 
+            mMachinaService.startVirtualMachine()
+            CoroutineScope(Dispatchers.IO).launch {
+                val shell = FileInputStream(mMachinaService.mShellReader.fileDescriptor)
+                Reader("shell", mShellTextState, shell).run()
+            }
+
             CoroutineScope(Dispatchers.IO).launch {
                 val console = FileInputStream(mMachinaService.mConsoleReader.fileDescriptor)
                 Reader("console", mConsoleTextState, console).run()
             }
-            mMachinaService.startVirtualMachine()
-
         }
 
         override fun onServiceDisconnected(arg0: ComponentName) {
@@ -52,7 +47,10 @@ class MachineRepository(private val context: Context) {
     }
 
     private val mConsoleTextState: MutableState<String> = mutableStateOf("")
+    private val mShellTextState: MutableState<String> = mutableStateOf("")
+    val shellTextState: MutableState<String> = mShellTextState
     val consoleTextState: State<String> = mConsoleTextState
+
 
     fun startMachinaService() {
         Intent(context, MachinaService::class.java).also { intent ->
@@ -70,6 +68,12 @@ class MachineRepository(private val context: Context) {
         }
     }
 
+    fun sendCommand(cmd: String) {
+        if (mMachinaBound) {
+            mMachinaService.sendCommand(cmd)
+        }
+    }
+
     internal class Reader(
         private val mName: String,
         private val mOutput: MutableState<String>,
@@ -78,9 +82,9 @@ class MachineRepository(private val context: Context) {
         override fun run() {
             try {
                 val reader = BufferedReader(InputStreamReader(mStream))
-                var line: String
-                while (reader.readLine().also { line = it } != null && !Thread.interrupted()) {
-                    mOutput.value += line + "\n"
+                var char: Char
+                while (reader.read().also { char = it.toChar() } != -1 && !Thread.interrupted()) {
+                    mOutput.value += char
                 }
             } catch (e: IOException) {
                 Timber.d("Exception while posting " + mName + " output: " + e.message)

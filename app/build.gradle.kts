@@ -76,6 +76,7 @@ dependencies {
     implementation(libs.ui.graphics)
     implementation(libs.ui.tooling.preview)
     implementation(libs.material3)
+    implementation(libs.accompanist.systemuicontroller)
 
     // Shizuku
     implementation(libs.shizuku.api)
