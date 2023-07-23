@@ -85,6 +85,11 @@ class MachineRepository(private val context: Context) {
                 var char: Char
                 while (reader.read().also { char = it.toChar() } != -1 && !Thread.interrupted()) {
                     mOutput.value += char
+
+                    // Handle clear
+                    if (mOutput.value.contains("\u001B[H\u001B[J")) {
+                        mOutput.value = ""
+                    }
                 }
             } catch (e: IOException) {
                 Timber.d("Exception while posting " + mName + " output: " + e.message)

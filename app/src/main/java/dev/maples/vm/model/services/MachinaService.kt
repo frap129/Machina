@@ -149,7 +149,7 @@ class MachinaService : Service() {
                     shellStream.write(byte)
                     line += byte.toChar()
 
-                    // Flush to state flow once we reach EOL or prompt
+                    // Log once we reach EOL or prompt
                     if (byte.toChar() == '\n' || line.endsWith(PROMPT_END)) {
                         Timber.d(line)
                         line = ""
