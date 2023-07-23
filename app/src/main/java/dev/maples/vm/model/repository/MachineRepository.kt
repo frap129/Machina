@@ -23,13 +23,18 @@ import java.io.InputStreamReader
 class MachineRepository(private val context: Context) {
     private lateinit var mMachinaService: MachinaService
     private var mMachinaBound: Boolean = false
+
+    private val mConsoleTextState: MutableState<String> = mutableStateOf("")
+    private val mShellTextState: MutableState<String> = mutableStateOf("")
+    val shellTextState: State<String> = mShellTextState
+    val consoleTextState: State<String> = mConsoleTextState
+
     private val mMachinaServiceConnection = object : ServiceConnection {
         override fun onServiceConnected(className: ComponentName, service: IBinder) {
             val binder = service as MachinaService.MachinaServiceBinder
             mMachinaService = binder.getService()
             mMachinaBound = true
 
-            mMachinaService.startVirtualMachine()
             CoroutineScope(Dispatchers.IO).launch {
                 val shell = FileInputStream(mMachinaService.mShellReader.fileDescriptor)
                 Reader("shell", mShellTextState, shell).run()
@@ -46,13 +51,8 @@ class MachineRepository(private val context: Context) {
         }
     }
 
-    private val mConsoleTextState: MutableState<String> = mutableStateOf("")
-    private val mShellTextState: MutableState<String> = mutableStateOf("")
-    val shellTextState: MutableState<String> = mShellTextState
-    val consoleTextState: State<String> = mConsoleTextState
-
-
-    fun startMachinaService() {
+    init {
+        // Start machina service on init
         Intent(context, MachinaService::class.java).also { intent ->
             context.bindService(
                 intent,
@@ -62,9 +62,20 @@ class MachineRepository(private val context: Context) {
         }
     }
 
+    fun startVirtualMachine() {
+        if (mMachinaBound) {
+            mMachinaService.startVirtualMachine()
+        } else {
+            // TODO: Properly handle UI State while machina is loading
+            startVirtualMachine()
+        }
+    }
+
     fun stopVirtualMachine() {
         if (mMachinaBound) {
             mMachinaService.stopVirtualMachine()
+            mConsoleTextState.value = ""
+            mShellTextState.value = ""
         }
     }
 

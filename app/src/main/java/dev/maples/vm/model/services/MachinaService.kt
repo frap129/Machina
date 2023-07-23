@@ -74,6 +74,7 @@ class MachinaService : Service() {
             delay(2500)
             try {
                 mRemoteShellManager = RemoteShellManager(mVirtualMachine!!, mShellWriter)
+                sendCommand("clear")
             } catch (e: Exception) {
                 Timber.d(e)
             }
@@ -81,8 +82,9 @@ class MachinaService : Service() {
     }
 
     fun stopVirtualMachine() {
-        mRemoteShellManager?.apply { write("") }
+        sendCommand("poweroff")
         mVirtualMachine = null
+        mRemoteShellManager = null
     }
 
     fun sendCommand(cmd: String) {

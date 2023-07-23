@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import dev.maples.vm.model.repository.MachineRepository
 
 class MachineViewModel(private val machineRepository: MachineRepository) : ViewModel() {
-    fun startRootVirtualMachine() = machineRepository.startMachinaService()
+    fun startRootVirtualMachine() = machineRepository.startVirtualMachine()
     fun stopRootVirtualMachine() = machineRepository.stopVirtualMachine()
     fun sendCommand(cmd: String) = machineRepository.sendCommand(cmd)
 
