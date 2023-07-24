@@ -3,11 +3,9 @@
 #include <stdlib.h>
 #include <sys/socket.h>
 #include <sys/wait.h>
-#include <termios.h>
 #include <unistd.h>
 #include <linux/vm_sockets.h>
 #include <pty.h>
-#include <fcntl.h>
 
 #define RX_PORT 3000
 #define TX_PORT 5000
