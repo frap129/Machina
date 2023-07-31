@@ -1,6 +1,7 @@
 package dev.maples.vm.model.services
 
 import android.app.Service
+import android.content.Context
 import android.content.Intent
 import android.os.Binder
 import android.os.IBinder
@@ -16,20 +17,22 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.lsposed.hiddenapibypass.HiddenApiBypass
 import timber.log.Timber
+import java.io.BufferedReader
+import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
 
 
 class MachinaService : Service() {
-    init {
-        HiddenApiBypass.addHiddenApiExemptions("")
+    companion object {
+        private const val NETWORK_SOCKET = "network.sock"
     }
 
     private val mBinder = MachinaServiceBinder()
     private lateinit var mVirtService: IVirtualizationService
     private var mRemoteShellManager: RemoteShellManager? = null
 
-    private var mVirtualMachine: IVirtualMachine? = null
+    var mVirtualMachine: IVirtualMachine? = null
     private val mConsoleWriter: ParcelFileDescriptor
     private val mLogWriter: ParcelFileDescriptor
     private val mShellWriter: ParcelFileDescriptor
@@ -39,6 +42,10 @@ class MachinaService : Service() {
     val mShellReader: ParcelFileDescriptor
 
     init {
+        HiddenApiBypass.addHiddenApiExemptions("")
+        System.loadLibrary("machina-jni")
+
+        // Setup pipes
         var pipes: Array<ParcelFileDescriptor> = ParcelFileDescriptor.createPipe()
         mConsoleReader = pipes[0]
         mConsoleWriter = pipes[1]
@@ -49,6 +56,8 @@ class MachinaService : Service() {
         mShellReader = pipes[0]
         mShellWriter = pipes[1]
     }
+
+    private external fun proxyVsockToUnix(vsockFd: Int, unixSocket: String)
 
     private fun getVirtualizationService() {
         mVirtService = IVirtualizationService.Stub.asInterface(
@@ -85,6 +94,42 @@ class MachinaService : Service() {
         sendCommand("poweroff")
         mVirtualMachine = null
         mRemoteShellManager = null
+    }
+
+
+    fun setupNetworking(context: Context) {
+        val netSock = File(filesDir, NETWORK_SOCKET)
+        if (netSock.exists())
+            netSock.delete()
+
+        CoroutineScope(Dispatchers.IO).launch {
+            mVirtualMachine?.let {
+                delay(2500)
+                val networkVsock = it.connectVsock(3001)
+                val gvproxy = File(context.applicationInfo.nativeLibraryDir, "libgvproxy-host.so")
+                val gvproxyProcess = ProcessBuilder(
+                    gvproxy.absolutePath,
+                    "-debug",
+                    "-listen",
+                    "unix://${netSock.path}",
+                    "-mtu",
+                    "4000"
+                ).directory(context.filesDir).redirectErrorStream(true).start()
+                val error = BufferedReader(gvproxyProcess.errorStream.reader())
+                val out = BufferedReader(gvproxyProcess.inputStream.reader())
+
+                launch {
+                    delay(1000)
+                    proxyVsockToUnix(networkVsock.fd, netSock.path)
+                }
+                while (gvproxyProcess.isAlive) {
+                    Timber.d(error.read().toChar().toString())
+                    Timber.d(out.readLine())
+                }
+                Timber.d("dead")
+            }
+
+        }
     }
 
     fun sendCommand(cmd: String) {

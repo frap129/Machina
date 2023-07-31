@@ -20,6 +20,15 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+        ndk {
+            abiFilters += "arm64-v8a"
+            abiFilters += "x86_64"
+        }
+        externalNativeBuild {
+            cmake {
+                cppFlags += ""
+            }
+        }
     }
     buildTypes {
         release {
@@ -45,6 +54,12 @@ android {
     }
     androidResources {
         noCompress += "img"
+    }
+    externalNativeBuild {
+        cmake {
+            path = file("src/main/cpp/CMakeLists.txt")
+            version = "3.22.1"
+        }
     }
 }
 

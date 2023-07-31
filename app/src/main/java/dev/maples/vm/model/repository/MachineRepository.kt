@@ -65,6 +65,8 @@ class MachineRepository(private val context: Context) {
     fun startVirtualMachine() {
         if (mMachinaBound) {
             mMachinaService.startVirtualMachine()
+
+            mMachinaService.setupNetworking(context)
         } else {
             // TODO: Properly handle UI State while machina is loading
             startVirtualMachine()

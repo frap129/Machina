@@ -1,0 +1,3 @@
+[submodule "app/src/main/cpp/gvisor-tap-vsock"]
+	path = app/src/main/cpp/gvisor-tap-vsock
+	url = https://github.com/containers/gvisor-tap-vsock

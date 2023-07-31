@@ -11,6 +11,16 @@ cp machina/* /out/machina-rootfs/opt/machina/
 
 # Build C files
 clang -o /out/machina-rootfs/opt/machina/vsock-shell src/vsock-shell.c
+clang -o /out/machina-rootfs/opt/machina/gvforwarder-proxy src/gvforwarder-proxy.c
+
+# Build gvforwarder
+if [ ! -f /out/gvforwarder ]; then
+  cd gvisor-tap-vsock
+  make vm
+  cp bin/gvforwarder /out/
+  cd ..
+fi
+cp /out/gvforwarder /out/machina-rootfs/opt/machina
 
 # Write fstab
 echo '/dev/vda / erofs rw,noatime 0 0
