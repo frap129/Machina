@@ -3,7 +3,7 @@
 buildscript {
     repositories {
         google()
-        mavenCentral()  // Google's Maven repository
+        mavenCentral() // Google's Maven repository
         gradlePluginPortal()
     }
 }
@@ -12,4 +12,5 @@ plugins {
     alias(libs.plugins.androidApplication) apply false
     alias(libs.plugins.kotlinAndroid) apply false
     alias(libs.plugins.androidLibrary) apply false
+    alias(libs.plugins.ktlint)
 }

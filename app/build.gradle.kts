@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlinAndroid)
     alias(libs.plugins.refine)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.ktlint)
 }
 
 android {
@@ -33,7 +34,10 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = false
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
         }
     }
     kotlin {
@@ -79,7 +83,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.service)
 
     // Navigation
-   implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.navigation.compose)
 
     // Data Storage
     implementation(libs.androidx.datastore.preferences)
@@ -102,7 +106,7 @@ dependencies {
     implementation(libs.refine.runtime)
     compileOnly(project(":hidden-api-stub"))
 
-    //Dependency Injection
+    // Dependency Injection
     implementation(libs.koin.android)
     implementation(libs.koin.androidx.compose)
 
@@ -118,4 +122,11 @@ dependencies {
     androidTestImplementation(libs.ui.test.junit4)
     debugImplementation(libs.ui.tooling)
     debugImplementation(libs.ui.test.manifest)
+}
+
+configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
+    android.set(true)
+    outputToConsole.set(true)
+    ignoreFailures.set(true)
+    enableExperimentalRules.set(true)
 }
