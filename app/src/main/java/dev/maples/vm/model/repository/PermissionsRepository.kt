@@ -45,11 +45,19 @@ class PermissionsRepository(private val context: Context) {
     )
     val shizukuPermissionState = _shizukuPermissionState.asStateFlow()
         get() {
-            val result = when (Shizuku.isPreV11() || Shizuku.getVersion() < 11) {
-                true -> PermissionChecker.checkSelfPermission(context, ShizukuProvider.PERMISSION)
-                false -> Shizuku.checkSelfPermission()
+            try {
+                val result = when (Shizuku.isPreV11() || Shizuku.getVersion() < 11) {
+                    true -> PermissionChecker.checkSelfPermission(
+                        context,
+                        ShizukuProvider.PERMISSION
+                    )
+
+                    false -> Shizuku.checkSelfPermission()
+                }
+                _shizukuPermissionState.value = getShizukuPermissionState(result)
+            } catch (e: Exception) {
+                _shizukuPermissionState.value = PermissionState.Failed
             }
-            _shizukuPermissionState.value = getShizukuPermissionState(result)
             return field
         }
     private val onRequestShizukuPermission =
