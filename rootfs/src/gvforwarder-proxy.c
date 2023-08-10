@@ -120,7 +120,6 @@ int main() {
     return 1;
   } else if (pid == 0) {
     // Child process
-    close(vsock_conn);
 
     sleep(2);
 
@@ -128,6 +127,7 @@ int main() {
     char *args[] = {"/opt/machina/gvforwarder", "-url", "unix:///tmp/.machina_network.sock", NULL};
     execvp(args[0], args);
     perror("execvp");
+
     exit(1);
   }
 
@@ -158,7 +158,6 @@ int main() {
 
   // Close the sockets.
   close(vsock_socket);
-  close(vsock_conn);
   close(unix_socket);
 
   return 0;
