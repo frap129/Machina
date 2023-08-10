@@ -11,7 +11,7 @@
     </queries>
 
     <application
-        android:name=".MachinaApplication"
+        android:name=".main.MachinaApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -22,7 +22,7 @@
         android:theme="@style/Theme.Machina"
         android:extractNativeLibs="true">
         <service
-            android:name=".model.services.MachinaService"
+            android:name=".machines.model.service.MachinaService"
             android:enabled="true"
             android:exported="false" />
 
@@ -31,7 +31,7 @@
             android:required="true" />
 
         <activity
-            android:name=".ui.MainActivity"
+            android:name=".main.MainActivity"
             android:exported="true"
             android:theme="@style/Theme.Machina">
             <intent-filter>
