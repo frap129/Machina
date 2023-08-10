@@ -19,7 +19,6 @@ import rikka.shizuku.ShizukuProvider
 import rikka.shizuku.SystemServiceHelper
 import timber.log.Timber
 
-
 const val PERMISSION_MANAGE_VM = "android.permission.MANAGE_VIRTUAL_MACHINE"
 const val PERMISSION_CUSTOM_VM = "android.permission.USE_CUSTOM_VIRTUAL_MACHINE"
 

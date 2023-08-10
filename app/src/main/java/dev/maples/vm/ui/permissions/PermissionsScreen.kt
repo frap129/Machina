@@ -58,8 +58,9 @@ fun PermissionsScreen(
                             permission = MachinaPermission.CUSTOM_VM_PERMISSION
                         )
 
-                        PermissionState.Granted, PermissionState.Failed -> navController
-                            .navigate("machines")
+                        PermissionState.Granted, PermissionState.Failed ->
+                            navController
+                                .navigate("machines")
                     }
                 }
             }

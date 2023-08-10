@@ -10,7 +10,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import dev.maples.vm.R
 
-
 @Composable
 fun PermissionFailedScreen() {
     Box {

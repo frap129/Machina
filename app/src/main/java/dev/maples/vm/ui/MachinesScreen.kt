@@ -39,7 +39,7 @@ import timber.log.Timber
 @Composable
 fun MachinesScreen(
     navController: NavController,
-    machineViewModel: MachineViewModel = koinViewModel(),
+    machineViewModel: MachineViewModel = koinViewModel()
 ) {
     val consoleVisibility = remember { mutableStateOf(false) }
     Column(
@@ -144,9 +144,9 @@ fun MachinesScreen(
                         colors = TextFieldDefaults.colors(
                             focusedIndicatorColor = Color.Transparent,
                             unfocusedIndicatorColor = Color.Transparent,
-                            disabledIndicatorColor = Color.Transparent,
+                            disabledIndicatorColor = Color.Transparent
                         ),
-                        onValueChange = { commandText.value = it },
+                        onValueChange = { commandText.value = it }
                     )
                     Button(
                         colors = ButtonDefaults.buttonColors(
@@ -166,7 +166,6 @@ fun MachinesScreen(
                     }
                 }
             }
-
 
             NavigationBar {
                 NavigationBarItem(

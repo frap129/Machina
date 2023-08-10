@@ -9,10 +9,7 @@ import androidx.compose.ui.platform.LocalContext
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 @Composable
-fun MachinaTheme(
-    isDarkTheme: Boolean = isSystemInDarkTheme(),
-    content: @Composable () -> Unit
-) {
+fun MachinaTheme(isDarkTheme: Boolean = isSystemInDarkTheme(), content: @Composable () -> Unit) {
     val colorScheme = when (isDarkTheme) {
         true -> dynamicDarkColorScheme(LocalContext.current)
         false -> dynamicLightColorScheme(LocalContext.current)

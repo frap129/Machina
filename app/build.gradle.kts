@@ -40,25 +40,31 @@ android {
             )
         }
     }
+
     kotlin {
         jvmToolchain(11)
     }
+
     buildFeatures {
         compose = true
         aidl = true
         buildConfig = true
     }
+
     composeOptions {
         kotlinCompilerExtensionVersion = "1.4.8"
     }
+
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+
     androidResources {
         noCompress += "img"
     }
+
     externalNativeBuild {
         cmake {
             path = file("src/main/cpp/CMakeLists.txt")

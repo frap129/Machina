@@ -11,17 +11,16 @@ import android.system.virtualizationservice.IVirtualMachine
 import android.system.virtualizationservice.IVirtualMachineCallback
 import android.system.virtualizationservice.IVirtualizationService
 import dev.maples.vm.model.data.RootVirtualMachine
+import java.io.BufferedReader
+import java.io.File
+import java.io.FileInputStream
+import java.io.FileOutputStream
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.lsposed.hiddenapibypass.HiddenApiBypass
 import timber.log.Timber
-import java.io.BufferedReader
-import java.io.File
-import java.io.FileInputStream
-import java.io.FileOutputStream
-
 
 class MachinaService : Service() {
     companion object {
@@ -96,11 +95,11 @@ class MachinaService : Service() {
         mRemoteShellManager = null
     }
 
-
     fun setupNetworking(context: Context) {
         val netSock = File(filesDir, NETWORK_SOCKET)
-        if (netSock.exists())
+        if (netSock.exists()) {
             netSock.delete()
+        }
 
         CoroutineScope(Dispatchers.IO).launch {
             mVirtualMachine?.let {
@@ -128,7 +127,6 @@ class MachinaService : Service() {
                 }
                 Timber.d("dead")
             }
-
         }
     }
 
@@ -179,7 +177,7 @@ class MachinaService : Service() {
             var line = ""
             while (readVsock.fileDescriptor.valid()) {
                 // Set polling rate
-                //delay(10)
+                // delay(10)
                 state = State.Running.Reading
 
                 // Try to read from vsock
@@ -230,7 +228,6 @@ class MachinaService : Service() {
         override fun onPayloadReady(cid: Int) {}
         override fun onPayloadFinished(cid: Int, exitCode: Int) {}
     }
-
 
     override fun onBind(intent: Intent): IBinder = mBinder
     inner class MachinaServiceBinder : Binder() {

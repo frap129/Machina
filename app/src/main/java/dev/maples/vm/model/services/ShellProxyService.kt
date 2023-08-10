@@ -3,8 +3,8 @@ package dev.maples.vm.model.services
 import android.content.pm.IPackageManager
 import dev.maples.vm.BuildConfig
 import dev.maples.vm.IShellProxyService
-import rikka.shizuku.SystemServiceHelper
 import kotlin.system.exitProcess
+import rikka.shizuku.SystemServiceHelper
 
 class ShellProxyService : IShellProxyService.Stub() {
     override fun destroy() {

@@ -24,7 +24,6 @@ import dev.maples.vm.R
 import dev.maples.vm.ui.permissions.PermissionsScreen
 import dev.maples.vm.ui.theme.MachinaTheme
 
-
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,7 +53,7 @@ fun Machina() {
             modifier = Modifier
                 .align(Alignment.Start)
                 .fillMaxWidth()
-                .padding(24.dp, 0.dp, 16.dp, 0.dp),
+                .padding(24.dp, 0.dp, 16.dp, 0.dp)
         )
 
         val navController = rememberNavController()
