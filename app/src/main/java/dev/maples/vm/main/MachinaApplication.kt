@@ -4,11 +4,15 @@ import android.app.Application
 import android.content.Context
 import dev.maples.vm.BuildConfig
 import dev.maples.vm.machines.model.repo.MachineRepository
-import dev.maples.vm.permissions.model.repo.PermissionsRepository
-import dev.maples.vm.preferences.model.repo.PreferencesRepository
 import dev.maples.vm.machines.viewmodel.MachineViewModel
+import dev.maples.vm.permissions.model.repo.PermissionsRepository
 import dev.maples.vm.permissions.viewmodel.PermissionsViewModel
+import dev.maples.vm.preferences.model.repo.PreferencesRepository
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.koin.android.ext.koin.androidContext
+import org.koin.android.ext.koin.androidLogger
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.context.startKoin
 import org.koin.dsl.module
@@ -27,12 +31,13 @@ class MachinaApplication : Application() {
 
     private val viewModelModule = module {
         viewModel { PermissionsViewModel(get()) }
-        viewModel { MachineViewModel(get()) }
+        single<MachineViewModel> { MachineViewModel(get()) }
     }
 
     override fun attachBaseContext(base: Context) {
         startKoin {
             androidContext(base)
+            androidLogger()
             modules(appModule, repoModule, viewModelModule)
         }
         super.attachBaseContext(base)
@@ -54,3 +59,6 @@ class MachinaApplication : Application() {
         }
     }
 }
+
+fun launchInBackground(block: suspend CoroutineScope.() -> Unit) =
+    CoroutineScope(Dispatchers.IO).launch(block = block)

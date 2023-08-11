@@ -38,12 +38,11 @@ int read_if_available(int vsock_fd, char *data, int data_len) {
     return data_len;
 }
 
-
 extern "C"
 JNIEXPORT void JNICALL
-Java_dev_maples_vm_model_services_MachinaService_proxyVsockToUnix(JNIEnv *env, jobject thiz,
-                                                                  jint vsock_fd,
-                                                                  jstring unix_socket) {
+Java_dev_maples_vm_machines_model_data_VirtualMachine_proxyVsockToUnix(JNIEnv *env, jobject thiz,
+                                                                       jint vsock_fd,
+                                                                       jstring unix_socket) {
     // Get socket path info
     char *unix_path = strdup(env->GetStringUTFChars(unix_socket, 0));
 

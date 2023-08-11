@@ -5,6 +5,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
 import dev.maples.vm.R
+import dev.maples.vm.machines.ui.Destinations.MachineLog
 import dev.maples.vm.permissions.model.data.PermissionState
 import dev.maples.vm.permissions.viewmodel.PermissionsViewModel
 import dev.maples.vm.permissions.viewmodel.PermissionsViewModel.MachinaPermission
@@ -59,8 +60,7 @@ fun PermissionsScreen(
                         )
 
                         PermissionState.Granted, PermissionState.Failed ->
-                            navController
-                                .navigate("machines")
+                            navController.navigate(MachineLog.route)
                     }
                 }
             }

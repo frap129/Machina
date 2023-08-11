@@ -22,7 +22,7 @@
         android:theme="@style/Theme.Machina"
         android:extractNativeLibs="true">
         <service
-            android:name=".machines.model.service.MachinaService"
+            android:name=".machines.model.service.VirtualMachineService"
             android:enabled="true"
             android:exported="false" />
 

@@ -13,8 +13,10 @@
     <string name="custom_vm_pending">Granting android.permission.USE_CUSTOM_VIRTUAL_MACHINE to self…</string>
     <string name="allow">Allow</string>
 
-    <!-- VM Controls -->
+    <!-- Machines -->
     <string name="run_vm">Run VM</string>
     <string name="stop_vm">Stop VM</string>
+    <string name="creating_vm">Creating Virtual Machine…</string>
+    <string name="vm_loading">Virtual Machine not running</string>
 
 </resources>
