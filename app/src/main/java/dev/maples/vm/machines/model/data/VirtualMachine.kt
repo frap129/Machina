@@ -1,6 +1,7 @@
 package dev.maples.vm.machines.model.data
 
 import android.os.ParcelFileDescriptor
+import android.system.virtualizationservice.CpuTopology
 import android.system.virtualizationservice.DiskImage
 import android.system.virtualizationservice.IVirtualMachine
 import android.system.virtualizationservice.IVirtualMachineCallback
@@ -266,12 +267,13 @@ class VirtualMachine : KoinComponent {
         }
 
         // No-op for custom VMs
-        override fun onPayloadStarted(cid: Int, stream: ParcelFileDescriptor?) {}
+        override fun onPayloadStarted(cid: Int) {}
         override fun onPayloadReady(cid: Int) {}
         override fun onPayloadFinished(cid: Int, exitCode: Int) {}
     }
 
     private object DefaultVMConfig : VirtualMachineRawConfig() {
+        const val NAME = "MachinaHostVM"
         const val IMAGE_DIR = "/data/local/tmp"
         const val KERNEL_PATH = "$IMAGE_DIR/kernel"
         const val ROOTFS_PATH = "$IMAGE_DIR/machina-rootfs.img"
@@ -279,6 +281,7 @@ class VirtualMachine : KoinComponent {
         const val SWAP_PATH = "$IMAGE_DIR/swap.qcow2"
 
         init {
+            name = NAME
             params =
                 "panic=-1 rcu_nocbs=0-7 workqueue.power_efficient=1 root=/dev/vda rootfstype=erofs ro" +
                 " init=/opt/machina/preinit console=hvc0 console=hvc2,115200"
@@ -318,8 +321,7 @@ class VirtualMachine : KoinComponent {
             protectedVm = false
             platformVersion = "1.0"
             taskProfiles = arrayOf("MaxPerformance", "MaxIoPriority")
-            numCpus = 8
-            cpuAffinity = "0-7"
+            cpuTopology = CpuTopology.MATCH_HOST
         }
 
         val config = VirtualMachineConfig().apply { rawConfig = this@DefaultVMConfig }

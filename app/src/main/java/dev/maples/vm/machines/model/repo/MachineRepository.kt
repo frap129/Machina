@@ -10,6 +10,7 @@ import dev.maples.vm.machines.model.service.VirtualMachineService
 import dev.maples.vm.main.launchInBackground
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collectLatest
 
 class MachineRepository(private val context: Context) {
     private lateinit var mVirtualMachineService: VirtualMachineService
@@ -25,7 +26,9 @@ class MachineRepository(private val context: Context) {
             mVMServiceBound = true
 
             launchInBackground {
-                _virtualMachine.value = mVirtualMachineService.virtualMachine
+                mVirtualMachineService.virtualMachine.collectLatest {
+                    _virtualMachine.value = it
+                }
             }
         }
 
