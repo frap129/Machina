@@ -8,6 +8,8 @@ import dev.maples.vm.machines.viewmodel.MachineViewModel
 import dev.maples.vm.permissions.model.repo.PermissionsRepository
 import dev.maples.vm.permissions.viewmodel.PermissionsViewModel
 import dev.maples.vm.preferences.model.repo.PreferencesRepository
+import dev.maples.vm.support.model.repo.SupportRepository
+import dev.maples.vm.support.viewmodel.SupportViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -24,12 +26,14 @@ class MachinaApplication : Application() {
     }
 
     private val repoModule = module {
+        single<SupportRepository> { SupportRepository(androidContext()) }
         single<PermissionsRepository> { PermissionsRepository(androidContext()) }
         single<PreferencesRepository> { PreferencesRepository(androidContext()) }
         single<MachineRepository> { MachineRepository(androidContext()) }
     }
 
     private val viewModelModule = module {
+        viewModel { SupportViewModel(get()) }
         viewModel { PermissionsViewModel(get()) }
         single<MachineViewModel> { MachineViewModel(get()) }
     }

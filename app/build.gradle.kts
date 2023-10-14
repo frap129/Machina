@@ -8,12 +8,12 @@ plugins {
 
 android {
     namespace = "dev.maples.vm"
-    compileSdk = 33
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "dev.maples.vm"
-        minSdk = 33
-        targetSdk = 33
+        minSdk = 34
+        targetSdk = 34
         versionCode = 1
         versionName = "1.0"
 
@@ -24,11 +24,6 @@ android {
         ndk {
             abiFilters += "arm64-v8a"
             abiFilters += "x86_64"
-        }
-        externalNativeBuild {
-            cmake {
-                cppFlags += ""
-            }
         }
     }
     buildTypes {

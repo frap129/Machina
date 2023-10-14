@@ -1,4 +1,3 @@
-@Suppress("DSL_SCOPE_VIOLATION") // TODO: Remove once KTIJ-19369 is fixed
 plugins {
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.kotlinAndroid)
@@ -6,7 +5,7 @@ plugins {
 
 android {
     namespace = "dev.maples.hidden_api_stub"
-    compileSdk = 33
+    compileSdk = 34
 
     defaultConfig {
         minSdk = 33
@@ -20,7 +19,7 @@ android {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                "proguard-rules.pro",
             )
         }
     }
@@ -39,7 +38,6 @@ android {
 dependencies {
     annotationProcessor(libs.refine.annotation.processor)
     compileOnly(libs.refine.annotation)
-
 
     implementation(libs.core.ktx)
 }

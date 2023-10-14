@@ -1,6 +1,9 @@
 <resources>
     <string name="app_name">Machina</string>
 
+    <!-- Support -->
+    <string name="unsupported">Your device does not support the Android Virtualization Framework</string>
+
     <!-- Permissions -->
     <string name="shizuku_desc">Permission to use Shizuku is required to access the Android Virtualization Framework</string>
     <string name="request_shizuku">Connect to Shizuku</string>

@@ -5,6 +5,8 @@
     <uses-permission android:name="android.permission.MANAGE_VIRTUAL_MACHINE" />
     <uses-permission android:name="android.permission.USE_CUSTOM_VIRTUAL_MACHINE" />
 
+    <uses-feature android:name="android.software.virtualization_framework" android:required="false" />
+
     <!-- Used to check VirtualizationService permissions -->
     <queries>
         <package android:name="com.android.virtualmachine.res"/>
@@ -25,10 +27,6 @@
             android:name=".machines.model.service.VirtualMachineService"
             android:enabled="true"
             android:exported="false" />
-
-        <uses-library
-            android:name="android.system.virtualmachine"
-            android:required="true" />
 
         <activity
             android:name=".main.MainActivity"

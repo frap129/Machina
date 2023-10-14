@@ -27,13 +27,15 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import dev.maples.vm.R
 import dev.maples.vm.machines.ui.Destinations.MachinesScreens
-import dev.maples.vm.permissions.ui.Destinations.PermissionsScreen
 import dev.maples.vm.permissions.ui.Destinations.PermissionsScreens
+import dev.maples.vm.support.ui.Destinations.SupportScreen
+import dev.maples.vm.support.ui.Destinations.SupportScreens
 
 @Composable
 fun Machina() {
     // Collect all nav items
     val navItems = mutableListOf<MachinaDestination>()
+    navItems.addAll(SupportScreens)
     navItems.addAll(PermissionsScreens)
     navItems.addAll(MachinesScreens)
 
@@ -89,7 +91,7 @@ fun Machina() {
         content = { padding ->
             NavHost(
                 navController = navController,
-                startDestination = PermissionsScreen.route
+                startDestination = SupportScreen.route
             ) {
                 navItems.forEach { dest ->
                     composable(
