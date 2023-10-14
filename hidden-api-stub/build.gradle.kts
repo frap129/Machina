@@ -36,8 +36,10 @@ android {
 }
 
 dependencies {
+    // Refine
     annotationProcessor(libs.refine.annotation.processor)
     compileOnly(libs.refine.annotation)
 
+    // Kotlin
     implementation(libs.core.ktx)
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 The Android Open Source Project
+ * Copyright 2023 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,22 +15,11 @@
  */
 package android.system.virtualizationservice;
 
-/**
- * Type of the writable partition that virtualizationservice creates via
- * initializeWritablePartition.
- */
-@Backing(type="int")
-enum PartitionType {
-    /**
-     * The partition is simply initialized as all zeros
-     */
-    RAW = 0,
-    /**
-     * The partition is initialized as an instance image which is formatted to hold per-VM secrets
-     */
-    ANDROID_VM_INSTANCE = 1,
-    /**
-     * The partition is initialized to back encryptedstore disk image formatted to indicate intent
-     */
-    ENCRYPTEDSTORE = 2,
+/** The vCPU topology that will be generated for the VM. */
+@Backing(type="byte")
+enum CpuTopology {
+    /** One vCPU */
+    ONE_CPU = 0,
+    /** Match physical CPU topology of the host. */
+    MATCH_HOST = 1,
 }

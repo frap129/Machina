@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 The Android Open Source Project
+ * Copyright 2022 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,24 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package android.system.virtualizationservice;
+package android.system.virtualizationcommon;
 
 /**
- * Type of the writable partition that virtualizationservice creates via
- * initializeWritablePartition.
+ * Errors reported from within a VM.
  */
 @Backing(type="int")
-enum PartitionType {
+enum ErrorCode {
     /**
-     * The partition is simply initialized as all zeros
+     * Error code for all other errors not listed below.
      */
-    RAW = 0,
+    UNKNOWN = 0,
+
     /**
-     * The partition is initialized as an instance image which is formatted to hold per-VM secrets
+     * Error code indicating that the payload can't be verified due to various reasons (e.g invalid
+     * merkle tree, invalid formats, etc).
      */
-    ANDROID_VM_INSTANCE = 1,
+    PAYLOAD_VERIFICATION_FAILED = 1,
+
     /**
-     * The partition is initialized to back encryptedstore disk image formatted to indicate intent
+     * Error code indicating that the payload is verified, but has changed since the last boot.
      */
-    ENCRYPTEDSTORE = 2,
+    PAYLOAD_CHANGED = 2,
+
+    /**
+     * Error code indicating that the payload config is invalid.
+     */
+    PAYLOAD_CONFIG_INVALID = 3,
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 The Android Open Source Project
+ * Copyright 2022 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,24 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package android.system.virtualizationservice;
 
-/**
- * Type of the writable partition that virtualizationservice creates via
- * initializeWritablePartition.
- */
-@Backing(type="int")
-enum PartitionType {
+parcelable VirtualMachinePayloadConfig {
     /**
-     * The partition is simply initialized as all zeros
+     * Name of the payload executable file in the lib/<ABI> folder of an APK. The payload is in the
+     * form of a .so with a defined entry point; inside the VM this file is loaded and the entry
+     * function invoked.
      */
-    RAW = 0,
-    /**
-     * The partition is initialized as an instance image which is formatted to hold per-VM secrets
-     */
-    ANDROID_VM_INSTANCE = 1,
-    /**
-     * The partition is initialized to back encryptedstore disk image formatted to indicate intent
-     */
-    ENCRYPTEDSTORE = 2,
+    @utf8InCpp String payloadBinaryName;
 }
